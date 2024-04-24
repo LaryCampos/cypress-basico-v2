@@ -47,10 +47,14 @@ describe('Central de Atendimento ao Cliente TAT', function() {
         cy.get('#lastName').type('Campos')
         cy.get('#email').type('lari.gmail.com')
         cy.get('#open-text-area').type('Bom dia!', { delay: 0 })
+        
+        cy.clock()
         //cy.get('.button').click()
         cy.contains('.button', 'Enviar').click()
-
         cy.get('.error').should('be.visible')
+
+        cy.tick(3000)
+        cy.get('.error').should('not.be.visible')
     })
 
     it('Validação campo telefone não deve aceitar valor não numerico', function(){
@@ -65,10 +69,14 @@ describe('Central de Atendimento ao Cliente TAT', function() {
         //cy.get("#phone-checkbox").click()
         cy.get("#phone-checkbox").check()
         cy.get('#open-text-area').type('Bom dia!', { delay: 0 })
+        
+        cy.clock()
         //cy.get('.button').click()
         cy.contains('.button', 'Enviar').click()
-
         cy.get('.error').should('be.visible')
+
+        cy.tick(3000)
+        cy.get('.error').should('not.be.visible')
     })
 
     it('preenche e limpa os campos nome, sobrenome, email e telefone', function(){
@@ -89,19 +97,28 @@ describe('Central de Atendimento ao Cliente TAT', function() {
     })
 
     it('exibe mensagem de erro ao submeter o formulário sem preencher os campos obrigatórios', function(){
+        cy.clock()
         //cy.get('.button').click()
         cy.contains('.button', 'Enviar').click()
-
         cy.get('.error').should('be.visible')
+
+        cy.tick(3000)
+        cy.get('.error').should('not.be.visible')
         
     })
 
+    //Cypress._.times(5, () => {
     it('envia o formuário com sucesso usando um comando customizado', function(){
-        cy.fillMandatoryFieldsAndSubmit()
-
+         cy.fillMandatoryFieldsAndSubmit()
+        cy.clock()
+        cy.contains('.button', 'Enviar').click()
         cy.get('.success').should('be.visible')
-    })
 
+        cy.tick(3000)
+        cy.get('.error').should('not.be.visible')
+    })
+    //})
+    
     it('seleciona um produto (YouTube) por seu texto', function(){
         cy.get('select#product').select('YouTube').should('have.value', 'youtube')
 
@@ -173,5 +190,34 @@ describe('Central de Atendimento ao Cliente TAT', function() {
 
         //Também funciona pelo privacy.spec.js
     })
+
+    it('exibe e esconde as mensagens de sucesso e erro usando o .invoke', () => {
+        cy.get('.success')
+          .should('not.be.visible')
+          .invoke('show')
+          .should('be.visible')
+          .and('contain', 'Mensagem enviada com sucesso.')
+          .invoke('hide')
+          .should('not.be.visible')
+        cy.get('.error')
+          .should('not.be.visible')
+          .invoke('show')
+          .should('be.visible')
+          .and('contain', 'Valide os campos obrigatórios!')
+          .invoke('hide')
+          .should('not.be.visible')
+      })
+
+    it('preenche a area de texto usando o comando invoke', function(){
+        const longText = Cypress._.repeat('Preencha aqui', 80)
+        cy.get('#open-text-area').invoke('val', longText)
+        .should('have.value', longText)
+      })
+
+    it.only('encontre o gato', function(){
+        cy.get('#cat').invoke('show').should('be.visible')
+    })
+
+
 
 })
